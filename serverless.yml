@@ -1,0 +1,30 @@
+service: aws-forwarding-mail-ftp
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  profile: aws-forwarding-mail-ftp
+  stage: ${opt:stage, 'dev'}
+  region: us-east-1
+  environment:
+    BUCKET: aws-forwarding-s3
+functions:
+  receiveEmail:
+    handler: index.handler
+    environment:
+      ENVIRONMENT: ${env:ENVIRONMENT}
+      FTP_USER: ${env:FTP_USER}
+      FTP_PASS: ${env:FTP_PASS}
+      FTP_HOST: ${env:FTP_HOST}
+      FTP_PORT: ${env:FTP_PORT}
+    events:
+      - s3: ${self:provider.environment.BUCKET}
+package:
+  exclude:
+    - __mocks__/**
+    - __test__/**
+    - .serverless/**
+    - .vscode/**
+    - .gitignore
+    - .prettierrc
+    - README.md
